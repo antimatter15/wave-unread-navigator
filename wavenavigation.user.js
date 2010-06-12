@@ -1,0 +1,132 @@
+// ==UserScript==
+// @name          Wave Unread Navigator
+// @namespace     http://antimatter15.com
+// @description   Show gmail-like arrows listing if unread messages in an open wave are above or below
+// @include       https://wave.google.com/*
+// ==/UserScript==
+
+function getStyle(x,styleProp)
+{
+  //based on http://www.quirksmode.org/dom/getstyles.html
+	if (x.currentStyle)
+		var y = x.currentStyle[styleProp];
+	else if (window.getComputedStyle)
+		var y = document.defaultView.getComputedStyle(x,null).getPropertyValue(styleProp);
+	return y;
+}
+
+
+//ppk is awesome http://www.quirksmode.org/js/findpos.html
+function findPos(obj) {
+	var curleft = curtop = 0;
+	if (obj.offsetParent) {
+	  do {
+			curleft += obj.offsetLeft;
+			curtop += obj.offsetTop;
+	  } while (obj = obj.offsetParent);
+	}
+	return [curleft,curtop];
+}
+
+	
+//compute the class name
+function search_class(styles){
+    var rule_count = 0;
+    for(var style in styles){
+      rule_count++;
+    }
+    for(var i = 0, a = document.getElementsByTagName("*"); i < a.length; i++){
+      var el = a[i] //no! its the evil google super AI!
+      var matches = 0;
+      for(var style in styles){
+        if(getStyle(el, style) == styles[style] && el.className){
+          matches++
+        }
+        if(matches == rule_count){
+          return el.className;
+        }
+      }
+    }
+    return false;
+  }
+
+function createArrow(){
+  var arrow = document.createElement("div");
+  document.body.appendChild(arrow);
+  arrow.className = "unread_arrows";
+  arrow.style.position = "absolute";
+  arrow.style.zIndex = 9999999999; //the issue with zIndexes is that everyone wants a super huge number to be safe
+  arrow.style.backgroundColor = "green"; //copying Gmail.
+  arrow.style.color = "white"; //copying Gmail.
+  arrow.style.fontWeight = "bold"; //copying Gmail.
+  arrow.style.padding = "1px"; //copying Gmail.
+  arrow.style.opacity = ".65"
+  return arrow;
+}
+
+function visualize_unread(){
+  if(!window.unread_class){
+    window.unread_class = search_class({
+      "background-color": "rgb(153, 187, 0)",
+      "width": "3px",
+      "bottom": "3px",
+      'opacity': '1'
+    })
+  }
+  if(!window.scroll_class){
+    window.scroll_class = search_class({
+      "overflow-x": "hidden",
+      "overflow-y": "scroll",
+      "position": "absolute"
+    })
+  }
+  
+  if(!window.unread_class || !window.scroll_class){
+    //console.error("NO STUFF")
+    return; //no unread items
+  }
+  
+  for(var ua = document.getElementsByClassName("unread_arrows"), c = ua.length; c--;){
+    ua[c] //oh noes vista!
+    .parentNode.removeChild(ua[c]); //*wishes that happened
+  } 
+  
+  var scrolls = document.getElementsByClassName(scroll_class);
+  for(var i = 0; i < scrolls.length; i++){
+    //scrolls include things like Navigation, Contacts, Inbox, Waves, etc. Only the last have unreads
+    var unreads = scrolls[i].getElementsByClassName(unread_class);
+    if(unreads.length == 0) continue;
+    var viewportPos    = findPos(scrolls[i]);
+    var viewportTop    = scrolls[i].scrollTop+viewportPos[1];
+    var viewportBottom = viewportTop+scrolls[i].offsetHeight;
+    var above = 0;
+    var below = 0;
+    
+    for(var u = 0; u < unreads.length; u++){
+      var top = findPos(unreads[u])[1] //first value no matters!
+      if(top < viewportTop){
+        above++;
+      }else if(top > viewportBottom){
+        below++;
+      }
+    }
+    if(above > 0){
+      var arrow = createArrow();
+      arrow.style.top = viewportPos[1]+"px";
+      arrow.style.left = viewportPos[0]+"px";
+      arrow.innerHTML = "&uarr; "+above+" Unread";
+    }
+    if(below > 0){
+      var arrow = createArrow();
+      arrow.style.top = viewportPos[1]+scrolls[i].offsetHeight+"px";
+      arrow.style.left = viewportPos[0]+"px";
+      arrow.innerHTML = "&darr; "+below+" Unread";
+    }
+    //console.log(above, below);
+  }
+}
+
+setInterval(visualize_unread, 1000);
+
+//document.getElementsByClassName("IJB")[3].getElementsByClassName("BRB")[0]
+//document.getElementsByClassName("IJB")[3].scrollTop+findPos(document.getElementsByClassName("IJB")[3])[1] > findPos(document.getElementsByClassName("IJB")[3].getElementsByClassName("BRB")[0])[1]
