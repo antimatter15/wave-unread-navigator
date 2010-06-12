@@ -1,0 +1,30 @@
+A long time ago, wave used to be really hard to navigate.
+Real-time apps really need good navigation, the fact wave
+is tree-based, and not distinctly linear complicates things
+even moreso.
+
+I never use gmail, nobody ever emails me (i don't know why,
+honestly, i don't even get that much spam even though my email
+is like totally out-there, so here's one more opportunity for
+spambots to harvest my email which is antimatter15@gmail.com
+and if the bots have developed reverse psychology and only parse
+emails in the format of a pseudo-anti-spambot format of 
+antimatter15 [at] gmail [dot] com it's there too). So if you're
+reading this, I wouldn't mind a random email.
+
+Anyway, back on topic, uh, i like gmail's little thready arrows
+thingy. Though I'm not sure what it's supposed to do as it's not
+necessarily read-state sensitive half the time, and email really
+doesnt need arrows for that so much as it's really pretty linear 
+anyway.
+
+So i felt it would be useful in google wave and so I did it.
+
+Nowadays, there's the native [(3) Next] button which mostly
+obsoletes this functionality and I believe it probably wont 
+work anyway because of the new lazy-loading features.
+
+It includes a little class-detection engine via styles, but 
+that doesnt really matter.
+
+https://chrome.google.com/extensions/detail/jncflgepcddhcejhofdojlkjgjhcfmpc
